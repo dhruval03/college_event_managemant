@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-image: url('/img/login_register_bg2.jpg');
+  background-size: cover; /* Cover the entire container */
+  background-position: center; /* Center the background image */
+  position: relative;
+}
+
+  .login {
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.729); /* Adjust the opacity as needed */
+    padding: 2% 0 2%;
+    padding-left: 2%;
+    padding-right: 2%;
+    border-radius: 30px;
+    width: 400px;
+    position: relative;
+    backdrop-filter: blur(4.5px);
+  }
+  .login h3 {
+    font-size: 250%;
+    font-weight: 200;
+    text-align: center;
+    font-family: algirian;
+  }
+  .forgetPassword {
+    font-size: 105%;
+    margin-left: 31.5%;
+    color: #000000;
+    position: relative;
+    text-decoration: none;
+    text-shadow: 0 0 0 rgb(0, 0, 0, 1);
+  }
+  .forgetPassword:hover {
+    color: rgb(0, 64, 201);
+  }
