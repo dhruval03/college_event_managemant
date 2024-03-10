@@ -3,6 +3,7 @@ import { getDatabase } from './db'; // Adjust the path as needed
 export default async function handler(req, res) {
   if (req.method === 'POST') {
     const {
+      facultyId,
       buildingId,
       buildingName,
       room,
@@ -12,6 +13,9 @@ export default async function handler(req, res) {
       Semester,
       Subject,
       topicName,
+      isStudent, 
+      isFaculty,
+      status,
     } = req.body;
 
     try {
@@ -19,26 +23,27 @@ export default async function handler(req, res) {
       const collection = database.collection('Slot_Booking_data');
 
       // Check if data already exists based on buildingId, room, selectedDate, and selectedTime
-      const existingRecords = await collection.find({ 
-        buildingId, 
-        room, 
-        Date, 
-        Time 
+      const existingRecords = await collection.find({
+        buildingId,
+        room,
+        Date,
+        Time
       }).toArray();
-      
+
       if (existingRecords.length > 0) {
         // Extrzact booked times from existing records
         const bookedTimes = existingRecords.map(record => record.Time);
-        
+
         // Return booked times in the response
-        res.status(400).json({ 
+        res.status(400).json({
           message: `Slot already booked for the following times on ${Date}: ${bookedTimes.join(', ')}`
         });
         return;
       }
-      
+
       // Insert the booking data into MongoDB
       await collection.insertOne({
+        facultyId,
         buildingId,
         buildingName,
         room,
@@ -48,6 +53,9 @@ export default async function handler(req, res) {
         Semester,
         Subject,
         topicName,
+        isStudent,
+        isFaculty,
+        status,
       });
 
       res.status(201).json({ message: 'Form submitted successfully' });
@@ -57,7 +65,7 @@ export default async function handler(req, res) {
     }
   } else if (req.method === 'GET') {
     const { buildingId, room, Date } = req.query; // Get buildingId, room, and Date from query parameters
-    
+
     try {
       const database = await getDatabase();
       const collection = database.collection('Slot_Booking_data');

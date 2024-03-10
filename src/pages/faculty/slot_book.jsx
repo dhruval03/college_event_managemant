@@ -1,19 +1,33 @@
 import Head from 'next/head';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createTheme } from '@mui/material/styles';
-import MenuItem from '@mui/material/MenuItem';
 import { ThemeProvider } from '@mui/system';
-import TextField from '@mui/material/TextField';
+import { Checkbox, FormControlLabel, TextField, MenuItem, Typography } from '@mui/material';
 import Navbar from '../components/navbar/nav';
 import Footer from '../components/footer/Footer';
 import { useSpring, animated } from 'react-spring';
 import { useRouter } from 'next/router';
 
-
 const theme = createTheme();
 
 const Slot_booking = () => {
+
+  useEffect(() => {
+    // Check if user is authenticated
+    if (!sessionStorage.getItem('authenticated')) {
+      router.push('/auth/login_register'); 
+    }
+
+
+    // Set up interval to fetch data periodically
+    const interval = setInterval(() => {
+    }, 60000); // Fetch data every 1 minute
+
+    // Clean up interval on unmount
+    return () => clearInterval(interval);
+  }, []);
+
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
   const [selectedBuilding, setSelectedBuilding] = useState(null);
@@ -24,7 +38,6 @@ const Slot_booking = () => {
   const [buildingRoomInfo, setBuildingRoomInfo] = useState({
     buildingId: null,
     room: null,
-    // Add other fields as needed
   });
 
   const [isVisible, setIsVisible] = useState(false);
@@ -33,37 +46,39 @@ const Slot_booking = () => {
   const [selectedSemester, setSelectedSemester] = useState('');
   const [selectedSubject, setSelectedSubject] = useState('');
   const [topicName, setTopicName] = useState('');
-  const router = useRouter(); // Use useRouter instead of useHistory
+  const [isStudent, setIsStudent] = React.useState(false);
+  const [isFaculty, setIsFaculty] = React.useState(false);
+  const router = useRouter();
 
-  const branches = ['IT', 'Civil', 'EC']; // Add your branch options
-  const semesters = [1, 2, 3, 4, 5, 6]; // Add your semester options
-  const subjects = {
-    IT: {
-      1: ['C', 'C++', 'EONS'],
-      2: ['Subject2A', 'Subject2B', 'Subject2C'],
-      3: ['Subject3A', 'Subject3B', 'Subject3C'],
-      4: ['Subject4A', 'Subject4B', 'Subject4C'],
-      5: ['Subject5A', 'Subject5B', 'Subject5C'],
-      6: ['AAD', 'PHP', 'DSA'],
-    },
-    Civil: {
-      1: ['C', 'Subject1Y', 'Subject1Z'],
-      2: ['V', 'Subject2Y', 'Subject2Z'],
-      3: ['I', 'Subject3Y', 'Subject3Z'],
-      4: ['V', 'Subject4Y', 'Subject4Z'],
-      5: ['I', 'Subject5Y', 'Subject5Z'],
-      6: ['L', 'Subject6Y', 'Subject6Z'],
-    },
-    EC: {
-      1: ['E', 'Subject1Q', 'Subject1R'],
-      2: ['Subject2P', 'Subject2Q', 'Subject2R'],
-      3: ['Subject3P', 'Subject3Q', 'Subject3R'],
-      4: ['Subject4P', 'E', 'Subject4R'],
-      5: ['Subject5P', 'Subject5Q', 'Subject5R'],
-      6: ['C', 'C', 'Subject6R'],
-    },
-    // Add more subjects for each branch and semester as needed
-  };
+  // const branches = ['IT', 'Civil', 'EC']; 
+  // const semesters = [1, 2, 3, 4, 5, 6]; 
+  // const subjects = {
+  //   IT: {
+  //     1: ['C', 'C++', 'EONS'],
+  //     2: ['Subject2A', 'Subject2B', 'Subject2C'],
+  //     3: ['Subject3A', 'Subject3B', 'Subject3C'],
+  //     4: ['Subject4A', 'Subject4B', 'Subject4C'],
+  //     5: ['Subject5A', 'Subject5B', 'Subject5C'],
+  //     6: ['AAD', 'PHP', 'DSA'],
+  //   },
+  //   Civil: {
+  //     1: ['C', 'Subject1Y', 'Subject1Z'],
+  //     2: ['V', 'Subject2Y', 'Subject2Z'],
+  //     3: ['I', 'Subject3Y', 'Subject3Z'],
+  //     4: ['V', 'Subject4Y', 'Subject4Z'],
+  //     5: ['I', 'Subject5Y', 'Subject5Z'],
+  //     6: ['L', 'Subject6Y', 'Subject6Z'],
+  //   },
+  //   EC: {
+  //     1: ['E', 'Subject1Q', 'Subject1R'],
+  //     2: ['Subject2P', 'Subject2Q', 'Subject2R'],
+  //     3: ['Subject3P', 'Subject3Q', 'Subject3R'],
+  //     4: ['Subject4P', 'E', 'Subject4R'],
+  //     5: ['Subject5P', 'Subject5Q', 'Subject5R'],
+  //     6: ['C', 'C', 'Subject6R'],
+  //   },
+  // 
+  // };
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -72,7 +87,7 @@ const Slot_booking = () => {
           setIsVisible(true);
         }
       },
-      { threshold: 0.5 } // Adjust the threshold as needed
+      { threshold: 0.5 }
     );
 
     // Start observing the image element
@@ -104,12 +119,12 @@ const Slot_booking = () => {
 
   const buildingData = [
     { id: 'A3', name: 'RPCP', rooms: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'] },
-    { id: 'A5', name: 'CSPIT-IT', rooms: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'] },
+    { id: 'A5', name: 'CSPIT', rooms: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'] },
     { id: 'A7', name: 'CSPIT-EC', rooms: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'] },
     { id: 'A8', name: 'Pharmacy', rooms: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'] },
     { id: 'A9', name: 'Depstar', rooms: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'] },
     { id: 'A10', name: 'CAMPICA', rooms: ['601', '602', '603', '604', '605', '606', '607', '608', '609', '610'] },
-    // Add more buildings and associated rooms as needed
+  
   ];
 
   const handleBuildingClick = (buildingId) => {
@@ -129,7 +144,6 @@ const Slot_booking = () => {
 
   const checkAvailability = async () => {
     try {
-      // Check if all required parameters are available
       if (!selectedBuilding || !selectedRoom || !selectedDate) {
         // alert("Please select building, room, and date.");
         return;
@@ -183,21 +197,18 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
     }
   };
 
-  // Execute checkAvailability whenever any of the parameters change
   useEffect(() => {
     checkAvailability();
   }, [selectedBuilding, selectedRoom, selectedDate]);
 
   const handleSubmit = () => {
     setShowSecondModal(true);
-    // Apply CSS class to hide main scrollbar
     document.body.classList.add('hide-scrollbar');
     setFirstModalVisible(false);
     setShowSecondModal(true);
     setBuildingRoomInfo({
       buildingId: selectedBuilding,
       room: selectedRoom,
-      // Add other field values as needed
     });
   };
 
@@ -208,7 +219,6 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
   };
   const handleCloseSecondModal = () => {
     setShowSecondModal(false);
-    // Remove CSS class to show main scrollbar
     document.body.classList.remove('hide-scrollbar');
   };
 
@@ -218,6 +228,13 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
   };
   const isSubmitDisabled = selectedRoom === null;
 
+  const handleStudentCheckboxChange = (event) => {
+    setIsStudent(event.target.checked);
+  };
+
+  const handleFacultyCheckboxChange = (event) => {
+    setIsFaculty(event.target.checked);
+  };
 
   // Function to submit data
   const submitData = async () => {
@@ -233,12 +250,13 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
 
     const emptyFields = requiredFields.filter(field => !field.value);
 
+    const facultyId = sessionStorage.getItem('facultyId');
+
     if (emptyFields.length > 0) {
-      // Display message indicating which fields are empty
       const emptyFieldNames = emptyFields.map(field => field.name).join(', ');
       alert(`Please fill in the following fields: ${emptyFieldNames}`);
     } else {
-      // Redirect to Booking_list page with field data as query parameters
+
       try {
         const response = await fetch('/api/Slot_data', {
           method: 'POST',
@@ -246,6 +264,7 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            facultyId: facultyId,
             buildingId: buildingRoomInfo.buildingId,
             buildingName: buildingData.find((building) => building.id === buildingRoomInfo.buildingId)?.name,
             room: buildingRoomInfo.room,
@@ -255,34 +274,65 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
             Semester: selectedSemester,
             Subject: selectedSubject,
             topicName,
+            isStudent: isStudent,
+            isFaculty: isFaculty,
+            status: "Pending",
           }),
         });
+        if (!facultyId) {
+          alert('Faculty ID not found in session.');
+          return;
+        }
+
         if (response.status === 201) {
-          router.push('../home_page/student_home_page');  
+
+          await sendEmail(facultyId);          
+          router.push('../faculty/faculty_home_page');
         } else if (response.status === 400) {
           alert("Data is already booked for this date and time");
         }
         else {
-          // Handle other error responses
           const data = await response.json();
           throw new Error(data.message || 'Error submitting form');
         }
       } catch (error) {
-        // Handle fetch error
         console.error('Error submitting form:', error.message);
         alert('Error submitting form. Please try again later.');
       }
     }
   };
 
-  // Call the function to retrieve booked times
+  const sendEmail = async (facultyId) => {
+    try {
+      const response = await fetch('../api/faculty/sendmail_api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          facultyId: facultyId, // Pass facultyId to backend
+          subject: 'Request for Slot Reservation',
+          text: "I'm reaching out to request a slot reservation for an upcoming session. I've provided the slot details to your account. Could you please check if a slot is available and let me know?",
+        }),
+      });
+  
+      if (response.status === 201) {
+        console.log('Email sent successfully');
+      } else {
+        const data = await response.json();
+        throw new Error(data.message || 'Error sending email');
+      }
+    } catch (error) {
+      console.error('Error sending email:', error.message);
+    }
+  };
 
   return (
     <div className="container-fluid p-0 position-relative">
       <Head>
         <title>Slot Booking</title>
       </Head>
-        <Navbar />
+      <Navbar />
       <div className="row">
         <div className="col-md-12 position-relative">
           <animated.img
@@ -443,18 +493,18 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
                 <div className="form-group">
                   <TextField
                     id="branchSelect"
-                    select
-                    label="Select Branch"
+                    // select
+                    label="Enter Branch"
                     fullWidth
                     value={selectedBranch}
                     onChange={handleBranchChange}
                     required
                   >
-                    {branches.map((branch) => (
+                    {/* {branches.map((branch) => (
                       <MenuItem key={branch} value={branch}>
                         {branch}
                       </MenuItem>
-                    ))}
+                    ))} */}
                   </TextField>
                 </div>
                 <br></br>
@@ -463,19 +513,19 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
                 <div className="form-group">
                   <TextField
                     id="semesterSelect"
-                    select
-                    label="Select Semester"
+                    // select
+                    label="Enter Semester"
                     fullWidth
                     value={selectedSemester}
                     onChange={handleSemesterChange}
-                    disabled={!selectedBranch}
+                    // disabled={!selectedBranch}
                     required
                   >
-                    {semesters.map((semester) => (
+                    {/* {semesters.map((semester) => (
                       <MenuItem key={semester} value={semester}>
                         {semester}
                       </MenuItem>
-                    ))}
+                    ))} */}
                   </TextField>
                 </div>
                 <br></br>
@@ -484,21 +534,21 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
                 <div className="form-group">
                   <TextField
                     id="subjectSelect"
-                    select
-                    label="Select Subject"
+                    // select
+                    label="Enter Subject"
                     fullWidth
                     value={selectedSubject}
                     onChange={handleSubjectChange}
-                    disabled={!selectedBranch || !selectedSemester}
+                    // disabled={!selectedBranch || !selectedSemester}
                     required
                   >
-                    {subjects && subjects[selectedBranch] && subjects[selectedBranch][selectedSemester]
+                    {/* {subjects && subjects[selectedBranch] && subjects[selectedBranch][selectedSemester]
                       ? subjects[selectedBranch][selectedSemester].map((subject) => (
                         <MenuItem key={subject} value={subject}>
                           {subject}
                         </MenuItem>
                       ))
-                      : null}
+                      : null} */}
                   </TextField>
                 </div>
                 <br></br>
@@ -510,7 +560,20 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
                   onChange={e => setTopicName(e.target.value)}
                   required
                 />
+
+                <Typography variant="subtitle1" style={{ marginBottom: '2px', marginTop: '15px' }}>Session for:</Typography>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1px' }}>
+                  <FormControlLabel
+                    control={<Checkbox checked={isStudent} onChange={handleStudentCheckboxChange} />}
+                    label="Student"
+                  />
+                  <FormControlLabel
+                    control={<Checkbox checked={isFaculty} onChange={handleFacultyCheckboxChange} />}
+                    label="Faculty"
+                  />
+                </div>
               </div>
+
               <div className="modal-footer" style={{ backgroundColor: '#e0f2f1' }}>
                 <button type="button" className="btn btn-secondary" onClick={handleCloseSecondModal} style={{ color: 'white', backgroundColor: '#2196f3' }}>
                   Close
@@ -585,7 +648,7 @@ Building ${selectedBuilding}, Room ${selectedRoom}:\n${data.bookedTimes.join('\n
           background-color: rgba(0, 0, 255, 0.5); /* Adjust the background color as needed */
         }
       `}</style>
-  <Footer />
+      <Footer />
     </div >
   );
 };

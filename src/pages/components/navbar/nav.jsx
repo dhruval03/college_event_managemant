@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaPhone, FaEnvelope, FaFacebook, FaTwitter, FaLinkedin, FaInstagram, FaUser, FaCog, FaSignOutAlt } from 'react-icons/fa';
 
@@ -8,7 +9,7 @@ const Logo = () => {
     <div className="header_logo">
       {/* Your logo content here */}
       <a href="/">
-        <img src="/img/logo.png"/>
+        <img src="/img/logo.png" />
       </a>
     </div>
   );
@@ -67,21 +68,21 @@ const ProfileImage = () => {
 
 // Navbar component
 
-const Navbar = () => {
-
+const Navbar = ({ activeHomePage }) => {
+ 
   let isStudentPage = false;
 
-    // Check if window is defined (i.e., if the code is running in the browser)
-    if (typeof window !== 'undefined') {
-        isStudentPage = window.location.pathname === '/home_page/student_home_page';
-    }
+  // Check if window is defined (i.e., if the code is running in the browser)
+  if (typeof window !== 'undefined') {
+    isStudentPage = window.location.pathname === '/student/student_home_page';
+  }
 
-    const handleSlotBookClick = (event) => {
-      // Check if window is defined to prevent errors during server-side rendering
-      if (typeof window !== 'undefined' && isStudentPage) {
-          event.preventDefault();
-          // Additional logic here to handle the click event, such as displaying a message or changing state
-      }
+  const handleSlotBookClick = (event) => {
+    // Check if window is defined to prevent errors during server-side rendering
+    if (typeof window !== 'undefined' && isStudentPage) {
+      event.preventDefault();
+      // Additional logic here to handle the click event, such as displaying a message or changing state
+    }
   };
 
 
@@ -118,17 +119,17 @@ const Navbar = () => {
         <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`}>
           <ul className="navbar-nav ml-auto h5">
             <li className="nav-item">
-              <a href="../../home_page/student_home_page" className="nav-link">Home</a>
+              <a href={`../../${activeHomePage}/${activeHomePage}_home_page`}  className="nav-link">Home</a>
             </li>
             <li className="nav-item h5">
               <a href="#" className="nav-link">About Us</a>
             </li>
             <li className="nav-item" id="slot-book-link">
-                    <a className={"nav-link" + (isStudentPage ? " disabled" : "")} href="../../slot_booking/slot_book" onClick={handleSlotBookClick}>
-                        Slot Book
-                        {isStudentPage && <span className="red-circle"></span>}
-                    </a>
-                </li>
+              <a className={"nav-link" + (isStudentPage ? " disabled" : "")} href="../../faculty/slot_book" onClick={handleSlotBookClick}>
+                Slot Book
+                {isStudentPage && <span className="red-circle"></span>}
+              </a>
+            </li>
           </ul>
         </div>
       </div>
@@ -139,6 +140,20 @@ const Navbar = () => {
 
 
 const Header = () => {
+
+  const router = useRouter();
+  const { pathname } = router;
+  let activeHomePage = '';
+
+  // Determine the active home page based on the module of the current URL
+  if (pathname.includes('/faculty/')) {
+    activeHomePage = 'faculty';
+  } else if (pathname.includes('/Admin/')) {
+    activeHomePage = 'Admin';
+  } else if (pathname.includes('/student/')) {
+    activeHomePage = 'student';
+  }
+
   return (
     <div>
       {/* First Header Line */}
@@ -170,7 +185,7 @@ const Header = () => {
         <div className="container">
           <div className="d-flex justify-content-between align-items-center">
             <Logo />
-            <Navbar />
+            <Navbar activeHomePage={activeHomePage} />
             <div className="d-flex align-items-center">
               <a href="#" className="Envelope"><FaEnvelope /></a>
               <ProfileImage />

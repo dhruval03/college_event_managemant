@@ -3,7 +3,7 @@ import Navbar from '../components/navbar/nav';
 import Slider from 'react-slick';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
-import { Button, TextField } from '@mui/material';
+import { Button, TextField} from '@mui/material';
 import Footer from '../components/footer/Footer';
 import { useRouter } from 'next/router';
 
@@ -35,7 +35,7 @@ const HomePage = () => {
             setData(data);
         } catch (error) {
             console.error('Error fetching data:', error.message);
-            // Handle error, e.g., show error message
+            // Handle error silently
         }
     };
 
@@ -66,6 +66,8 @@ const HomePage = () => {
         // Clean up interval on unmount
         return () => clearInterval(interval);
     }, []);
+
+    
 
     return (
         <div>
@@ -140,6 +142,52 @@ const SlotSearchForm = ({ fetchData }) => {
 };
 
 const DataTable = ({ data }) => {
+    const handleDelete = async (id) => {
+        try {
+            const response = await fetch(`/api/Admin/admin_api?id=${id}`, {
+                method: 'DELETE',
+            });
+            if (response.ok) {
+                console.log(`Slot with ID ${id} deleted successfully`);
+                // Refetch data to update the UI
+                // fetchData();
+            } else {
+                console.error('Failed to delete slot:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error deleting slot:', error);
+        }
+    };
+
+    const handleAccept = async (id) => {
+        try {
+            console.log('Accepting slot with ID:', id);
+            const response = await fetch(`/api/Admin/admin_api?id=${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: 'Accept' }),
+            });
+            console.log('Response:', response);
+            if (response.ok) {
+                // If status update is successful, fetch data again to reflect changes
+                // fetchData();
+                console.log(`Status updated successfully for row with ID: ${id}`);
+            } else {
+                // Handle non-successful response status
+                const errorMessage = await response.text();
+                console.error('Failed to update status:', errorMessage);
+                alert('Failed to update ');
+            }
+        } catch (error) {
+            console.error('Error updating status:', error.message);
+            alert('Error updating status');
+        }
+    };
+       
+    
+
     return (
         <div className="table-responsive">
             <table className="table table-bordered table-striped custom-table">
@@ -154,26 +202,42 @@ const DataTable = ({ data }) => {
                         <th>Branch</th>
                         <th>Semester</th>
                         <th>Subject</th>
+                        <th>Topic</th>
+                        <th>Status</th>
+                        <th>Actions</th> {/* Add a new column for actions */}
                     </tr>
                 </thead>
                 <tbody>
-                    {data.map((row, index) => (
-                        <tr key={index}>
-                            <td>{index + 1}</td>
-                            <td>{row.Faculty_name}</td>
-                            <td>{`${row.buildingId}-${row.buildingName}`}</td>
-                            <td>{row.room}</td>
-                            <td>{row.Date}</td>
-                            <td>{row.Time}</td>
-                            <td>{row.Branch}</td>
-                            <td>{row.Semester}</td>
-                            <td>{row.Subject}</td>
+                    {Array.isArray(data) && data.length > 0 ? (
+                        data.map((row, index) => (
+                            <tr key={index}>
+                                <td>{index + 1}</td>
+                                <td>{row.facultyName}</td>
+                                <td>{`${row.buildingId}-${row.buildingName}`}</td>
+                                <td>{row.room}</td>
+                                <td>{row.Date}</td>
+                                <td>{row.Time}</td>
+                                <td>{row.Branch}</td>
+                                <td>{row.Semester}</td>
+                                <td>{row.Subject}</td>
+                                <td>{row.topicName}</td>
+                                <td>{row.status}</td>
+                                <td style={{display:'flex'}}> {/* Actions column */}
+                                    <Button style={{ marginRight:'5px'}} variant="outlined" onClick={() => handleDelete(row._id)} color="error">Delete</Button>
+                                    <Button variant="outlined" onClick={() => handleAccept(row._id)}>Accept</Button>
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="12">No session for selected date.</td>
                         </tr>
-                    ))}
+                    )}
                 </tbody>
             </table>
         </div>
     );
 };
+
 
 export default HomePage;
